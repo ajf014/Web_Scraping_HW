@@ -39,8 +39,31 @@ def scrape_info():
     browser.visit(url_mars_image)
     html = browser.html
     soup_mars_image = bs(html, 'html.parser')
-    mars_img_path = soup_mars_image.find("img", class_='thumb')['src']
-    mars_img = url_mars_image + mars_img_path
+    img_drilldown = soup_mars_image.find("img", class_='thumb')
+    img_source = img_drilldown['src']
+    featured_image_url = 'https://www.jpl.nasa.gov'+img_source
+
+#     MARS TABLE
+    marsfacts_url = "https://space-facts.com/mars/"
+    tables = pd.read_html(marsfacts_url)
+    tables_df = tables[0]
+    tables_df.columns = ['fact', 'value']
+    mars_html = tables_df.to_html(header=True, index=False)
+    clean_mars_html= mars_html.replace('\n', '')
+
+#     HEMISPHERES
+    hem_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(hem_url)
+    hem_html = browser.html
+    hem_soup = bs(hem_html, 'html.parser')
+    hem_pics = hem_soup.find_all("img", class_='thumb')
+    hem_title = hem_soup.find_all("h3")
+    hemisphere_image_urls = []
+    for i in range(len(hem_pics)):
+            img_source = hem_pics[i].get("src")
+            title = hem_title[i].text
+            base_url = 'https://astrogeology.usgs.gov/'
+            hemisphere_image_urls.append({"title": title, "img_urls": base_url + img_source})
 
 
 
@@ -49,7 +72,9 @@ def scrape_info():
         "news_title": news_title,
         "news_p": news_p,
         "mars_weather": mars_weather,
-        "mars_img": mars_img,
+        "featured_image_url": featured_image_url,
+        "clean_mars_html": clean_mars_html,
+        "hemisphere_image_urls": hemisphere_image_urls
 }
 
     # Close the browser after scraping

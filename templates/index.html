@@ -20,8 +20,24 @@
     <p>{{ mars.news_p }}</p>
     <h4>The Current Weather on Mars is:</h4>
     <p>{{mars.mars_weather}}</p>
-    <img src="{{ mars.mars_img }}" alt="Mars">
+    {{mars.clean_mars_html|safe}}
+    <img src="{{ mars.featured_image_url }}" alt="Mars">
 
+
+    {% for hemisphere in mars.hemisphere_image_urls %}
+       <div class="col-md-6">
+           <div class="thumbnail">
+
+           <!-- if images is False/None/non-existent, then default to error message -->
+           <img src="{{hemisphere.img_urls}}"
+               alt="...">
+           <div class="caption">
+               <h3>{{hemisphere.title}}</h3>
+
+           </div>
+           </div>
+       </div>
+     {% endfor %}
 
 
   </div>
